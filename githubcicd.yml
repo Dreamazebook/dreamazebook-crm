@@ -1,0 +1,31 @@
+name: Deploy Dreamazebook Frontend to AWS
+ 
+on:
+  push:
+    branches: ["main"]
+ 
+jobs:
+  build:
+    runs-on: self-hosted
+ 
+    strategy:
+      matrix:
+        node-version: [22.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+ 
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+      - name: Install PM2
+        run: npm install -g pm2
+      - run: npm ci --legacy-peer-deps
+      - run: |
+          touch .env
+          echo "HUBSPOT_ACCESS_TOKEN=${{secrets.HUBSPOT_ACCESS_TOKEN}}" > .env
+      - run: npm run build --if-present
+      - run: pm2 delete dreamazebook
+      - run: pm2 start npm --name dreamazebook -- run start -- -p 3000
