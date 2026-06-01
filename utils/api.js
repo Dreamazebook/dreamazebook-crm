@@ -197,8 +197,8 @@ uploadApi.interceptors.response.use(handleResponse, handleError);
 
 /**
  * 浏览器端调用 Dreamazebook API。
- * - 生产/预览域名：直连 getApiBaseUrl()，避免大请求体经 Netlify 等 Next 代理被拦截。
- * - localhost：走同源 `/api` 代理（与 axios 一致），避免 dev-api 未放行本地 Origin 的 CORS。
+ * - 所有客户端 API 请求都通过本地 `/api` 代理，由 middleware.ts 转发到远端后端。
+ * - 这样可以统一处理跨域请求，同时保留本地内置 `/api` 路由。
  * 鉴权与 X-Guest-Session-Id 与默认 api 实例一致；错误对象带 `response: { status, data }`。
  */
 export async function fetchDreamazebookApi(path, options = {}) {
@@ -206,12 +206,8 @@ export async function fetchDreamazebookApi(path, options = {}) {
         throw new Error('fetchDreamazebookApi is client-only');
     }
     const { timeoutMs = 0, headers: initHeaders, ...restInit } = options;
-    const host = window.location.hostname;
-    const useSameOriginApiProxy =
-        host === 'localhost' || host === '127.0.0.1' || host === '[::1]';
-    const base = (useSameOriginApiProxy ? '/api' : getApiBaseUrl().replace(/\/+$/, ''));
     const rel = String(path || '').replace(/^\/+/, '');
-    const url = `${base}/${rel}`;
+    const url = `/api/${rel}`;
 
     const headers = new Headers(initHeaders || {});
     const token = localStorage.getItem('token');
