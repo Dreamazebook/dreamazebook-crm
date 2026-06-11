@@ -45,6 +45,10 @@ export const API_ADMIN_LOGSTIC_RESCHEDULE_PICKUP = (id:string|number) => `${API_
 export const API_ADMIN_PICBOOKS = '/admin/picbooks'
 export const API_ADMIN_PICBOOK_DETAIL = (id: string | number) => `${API_ADMIN_PICBOOKS}/${id}`
 
+export const API_ADMIN_COUPONS = '/admin/coupons';
+export const API_ADMIN_COUPON_DETAIL = (id: string | number) => `${API_ADMIN_COUPONS}/${id}`;
+export const API_ADMIN_COUPON_DISABLE = (id: string | number) => `${API_ADMIN_COUPON_DETAIL(id)}/disable`;
+
 export const API_PRODUCTS = '/products';
 
 export const API_PICBOOKS = '/picbooks'
